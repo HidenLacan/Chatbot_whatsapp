@@ -9,7 +9,14 @@ from sqlalchemy.orm import Session
 from model import Conversation, SessionLocal
 from utils import send_message, logger, search_wikipedia
 
+
+
 app = FastAPI()
+
+@app.get("/")
+def read_root():
+    return {"Hello": "World"}
+
 
 # Dependency
 def get_db():
