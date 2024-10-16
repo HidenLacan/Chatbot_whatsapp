@@ -5,9 +5,16 @@ import os
 # Third-party imports
 from twilio.rest import Client
 from decouple import config
+
+
+from langchain.llms import OpenAI
+from langchain.agents import initialize_agent, AgentType
 from langchain.tools import Tool
-from langchain_openai import OpenAI
-from langchain.agents import create_openai_functions_agent
+from decouple import config
+import wikipedia
+
+
+
 
 # Twilio setup
 account_sid = config("TWILIO_ACCOUNT_SID")
@@ -31,12 +38,6 @@ def send_message(to_number, body_text):
     except Exception as e:
         logger.error(f"Error sending message to {to_number}: {e}")
         
-        
-from langchain.llms import OpenAI
-from langchain.agents import initialize_agent, AgentType
-from langchain.tools import Tool
-from decouple import config
-import wikipedia
 
 def wikipedia_search_func(query):
     try:
