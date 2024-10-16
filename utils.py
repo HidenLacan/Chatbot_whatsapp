@@ -5,14 +5,11 @@ import os
 # Third-party imports
 from twilio.rest import Client
 from decouple import config
-from langchain.agents import load_tools
-from langchain.agents import initialize_agent
-from langchain.agents import AgentType
-from langchain.llms import OpenAI
+from langchain.tools import Tool
+from langchain_openai import OpenAI
+from langchain.agents import create_openai_functions_agent
 
-
-# Find your Account SID and Auth Token at twilio.com/console
-# and set the environment variables. See http://twil.io/secure
+# Twilio setup
 account_sid = config("TWILIO_ACCOUNT_SID")
 auth_token = config("TWILIO_AUTH_TOKEN")
 client = Client(account_sid, auth_token)
@@ -29,18 +26,23 @@ def send_message(to_number, body_text):
             from_=f"whatsapp:{twilio_number}",
             body=body_text,
             to=f"whatsapp:{to_number}"
-            )
+        )
         logger.info(f"Message sent to {to_number}: {message.body}")
     except Exception as e:
         logger.error(f"Error sending message to {to_number}: {e}")
 
+# Wikipedia search logic using updated LangChain
 def search_wikipedia(query):
-
-        """Search Wikipedia through the LangChain API
-           and use the OpenAI LLM wrapper and retrieve
-           the agent result based on the received query
-        """
-        llm = OpenAI(temperature=0, openai_api_key=config("OPENAI_API_KEY"))
-        tools = load_tools(["wikipedia"], llm=llm)
-        agent = initialize_agent(tools, llm, agent=AgentType.ZERO_SHOT_REACT_DESCRIPTION, verbose=False)
-        return agent.run(query)
+    """Search Wikipedia using LangChain OpenAI wrapper and return results"""
+    
+    # Initialize the OpenAI LLM
+    llm = OpenAI(temperature=0, openai_api_key=config("OPENAI_API_KEY"))
+    
+    # Load tools for Wikipedia (updated tool API)
+    tools = [Tool.from_function("wikipedia", llm=llm)]
+    
+    # Create the agent using the updated API
+    agent = create_openai_functions_agent(tools=tools, llm=llm, verbose=False)
+    
+    # Run the agent to get a response from Wikipedia
+    return agent.invoke({"input": query})
