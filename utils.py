@@ -31,40 +31,40 @@ def send_message(to_number, body_text):
     except Exception as e:
         logger.error(f"Error sending message to {to_number}: {e}")
 
-from langchain.prompts import PromptTemplate
+from langchain.llms import OpenAI
 from langchain.tools import Tool
-from langchain_openai import OpenAI
 from langchain.agents import create_openai_functions_agent
 from decouple import config
+import wikipedia
 
-# Define the Wikipedia search function
 def wikipedia_search_func(query):
-    return f"Results for {query} from Wikipedia"
+    try:
+        summary = wikipedia.summary(query, sentences=2)
+        return summary
+    except wikipedia.exceptions.DisambiguationError as e:
+        return f"Tu consulta es ambigua. Opciones posibles: {e.options}"
+    except wikipedia.exceptions.PageError:
+        return "No se encontró una página que coincida con tu consulta."
+    except Exception as e:
+        return f"Ocurrió un error: {str(e)}"
 
 def search_wikipedia(query):
-    """Search Wikipedia using LangChain OpenAI wrapper and return results"""
+    """Busca en Wikipedia usando LangChain y devuelve los resultados."""
     
-    # Initialize the OpenAI LLM
+    # Inicializa el modelo de lenguaje de OpenAI
     llm = OpenAI(temperature=0, openai_api_key=config("OPENAI_API_KEY"))
     
-    # Load tools for Wikipedia
+    # Define la herramienta para Wikipedia
     tools = [
         Tool.from_function(
             name="wikipedia", 
             func=wikipedia_search_func, 
-            description="Searches Wikipedia"
+            description="Busca en Wikipedia una consulta dada y devuelve un resumen."
         )
     ]
 
-    # Create a PromptTemplate including intermediate_steps
-    prompt = PromptTemplate.from_template(
-        "Use the Wikipedia tool to answer the following query: {input}\n"
-        "Additional details: {intermediate_steps}"
-    )
+    # Crea el agente sin un prompt personalizado
+    agent = create_openai_functions_agent(tools=tools, llm=llm)
 
-    # Create the agent with the prompt
-    agent = create_openai_functions_agent(tools=tools, llm=llm, prompt=prompt)
-
-    # Run the agent to get a response from Wikipedia
-    return agent.invoke({"input": query, "intermediate_steps": []})
-
+    # Ejecuta el agente para obtener una respuesta de Wikipedia
+    return agent.run(query)
