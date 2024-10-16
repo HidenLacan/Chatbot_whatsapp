@@ -23,9 +23,9 @@ from pyairtable import Table
 from decouple import config
 
 # Airtable configuration to env
-AIRTABLE_TOKEN = config("AIRTABLE_TOKEN")
-BASE_ID = config("BASE_ID")  # Your base ID
-TABLE_NAME = config("TABLE_NAME")  # Your table name
+air_token = config("AIRTABLE_TOKEN")
+base_id = config("BASE_ID")  # Your base ID
+table_name = config("TABLE_NAME")  # Your table name
 
 
 app = FastAPI()
@@ -36,7 +36,7 @@ def read_root():
 
 
 # Connect to the Airtable table
-table = Table(AIRTABLE_TOKEN, BASE_ID, TABLE_NAME)
+table = Table(air_token, base_id, table_name)
 
 # Function to add a record
 def save_ticket(ticket_number, description, start_date, phone_number):
@@ -78,4 +78,5 @@ async def reply(request: Request, Body: str = Form()):
         logger.error(f"Error storing conversation in Airtable: {e}")
     send_message(whatsapp_number, langchain_response)
     return ""
+
 
