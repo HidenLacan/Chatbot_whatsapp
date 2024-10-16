@@ -79,7 +79,7 @@
 #         logger.error(f"Error storing conversation in Airtable: {e}")
 #     send_message(whatsapp_number, langchain_response)
 #     return ""
-
+#working
 
 from fastapi import FastAPI, Form, Request
 from decouple import config
