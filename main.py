@@ -70,7 +70,7 @@ async def reply(request: Request, Body: str = Form()):
         #db.commit()
         logger.info(f"Conversation #{save_ticket} stored in database")
     except SQLAlchemyError as e:
-        db.rollback()
+        #db.rollback()
         logger.error(f"Error storing conversation in database: {e}")
     send_message(whatsapp_number, langchain_response)
     return ""
