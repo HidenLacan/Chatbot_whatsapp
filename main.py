@@ -27,6 +27,14 @@ AIRTABLE_TOKEN = config("AIRTABLE_TOKEN")
 BASE_ID = config("BASE_ID")  # Your base ID
 TABLE_NAME = config("TABLE_NAME")  # Your table name
 
+
+app = FastAPI()
+@app.get("/")
+def read_root():
+    return {"Hello": "World 2"}
+
+
+
 # Connect to the Airtable table
 table = Table(AIRTABLE_TOKEN, BASE_ID, TABLE_NAME)
 
@@ -40,10 +48,7 @@ def save_ticket(ticket_number, description, start_date, phone_number):
     }
     table.create(data)
 
-app = FastAPI()
-@app.get("/")
-def read_root():
-    return {"Hello": "World 2"}
+
 
 # Dependency
 #def get_db():
@@ -66,7 +71,9 @@ async def reply(request: Request, Body: str = Form()):
     # Store the conversation in the airtable
     try:
         save_ticket(whatsapp_number, Body, formatted_date, whatsapp_number)
+        
         logger.info(f"Conversation stored for WhatsApp number: {whatsapp_number}")
+        print(save_ticket.info())
     except Exception as e:
         logger.error(f"Error storing conversation in Airtable: {e}")
     send_message(whatsapp_number, langchain_response)
