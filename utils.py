@@ -39,7 +39,7 @@ def search_wikipedia(query):
     llm = OpenAI(temperature=0, openai_api_key=config("OPENAI_API_KEY"))
     
     # Load tools for Wikipedia (updated tool API)
-    tools = [Tool.from_function("wikipedia", llm=llm)]
+    tools = [Tool.from_function(name="wikipedia", func=search_wikipedia, description="Searches Wikipedia")]
     
     # Create the agent using the updated API
     agent = create_openai_functions_agent(tools=tools, llm=llm, verbose=False)
