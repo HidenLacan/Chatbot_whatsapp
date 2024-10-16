@@ -30,10 +30,11 @@ def send_message(to_number, body_text):
         logger.info(f"Message sent to {to_number}: {message.body}")
     except Exception as e:
         logger.error(f"Error sending message to {to_number}: {e}")
-
+        
+        
 from langchain.llms import OpenAI
+from langchain.agents import initialize_agent, AgentType
 from langchain.tools import Tool
-from langchain.agents import create_openai_functions_agent
 from decouple import config
 import wikipedia
 
@@ -49,22 +50,15 @@ def wikipedia_search_func(query):
         return f"Ocurrió un error: {str(e)}"
 
 def search_wikipedia(query):
-    """Busca en Wikipedia usando LangChain y devuelve los resultados."""
-    
-    # Inicializa el modelo de lenguaje de OpenAI
     llm = OpenAI(temperature=0, openai_api_key=config("OPENAI_API_KEY"))
-    
-    # Define la herramienta para Wikipedia
     tools = [
-        Tool.from_function(
+        Tool(
             name="wikipedia", 
             func=wikipedia_search_func, 
-            description="Busca en Wikipedia una consulta dada y devuelve un resumen."
+            description="Busca en Wikipedia y devuelve un resumen."
         )
     ]
-
-    # Crea el agente sin un prompt personalizado
-    agent = create_openai_functions_agent(tools=tools, llm=llm)
-
-    # Ejecuta el agente para obtener una respuesta de Wikipedia
+    agent = initialize_agent(
+        tools, llm, agent=AgentType.OPENAI_FUNCTIONS, verbose=True
+    )
     return agent.run(query)
