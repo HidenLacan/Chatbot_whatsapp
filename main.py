@@ -141,7 +141,7 @@ async def reply(request: Request, Body: str = Form()):
     #today = datetime.now()
     #formatted_date = today.strftime("%Y-%m-%d %H:%M:%S")
     #print(formatted_date)
-    formatted_date = datetime.now().isoformat()
+    formatted_date = datetime.now().strftime('%Y-%m-%d')
 
     # Almacenar la conversación en Airtable
     try:
@@ -158,3 +158,6 @@ async def reply(request: Request, Body: str = Form()):
     # Enviar respuesta al usuario vía WhatsApp
     send_message(whatsapp_number, langchain_response)
     return ""
+
+#save_ticket('+45454545445', 'prueba 2', '2014-02-02', '+45454545445')
+
