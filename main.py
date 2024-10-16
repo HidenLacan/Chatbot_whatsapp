@@ -66,12 +66,9 @@ async def reply(request: Request, Body: str = Form()):
     # Store the conversation in the airtable
     try:
         save_ticket(whatsapp_number, Body, formatted_date, whatsapp_number)
-        #db.add(conversation)
-        #db.commit()
-        logger.info(f"Conversation #{save_ticket} stored in database")
-    except SQLAlchemyError as e:
-        #db.rollback()
-        logger.error(f"Error storing conversation in database: {e}")
+        logger.info(f"Conversation stored for WhatsApp number: {whatsapp_number}")
+    except Exception as e:
+        logger.error(f"Error storing conversation in Airtable: {e}")
     send_message(whatsapp_number, langchain_response)
     return ""
 
