@@ -54,7 +54,7 @@ def read_root():
 #        db.close()
 
 @app.post("/message")
-async def reply(request: Request, Body: str = Form(), db: Session = Depends(get_db)):
+async def reply(request: Request, Body: str = Form()):
     # Extract the phone number from the incoming webhook request
     form_data = await request.form()
     whatsapp_number = form_data['From'].split("whatsapp:")[-1]
