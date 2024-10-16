@@ -42,7 +42,7 @@ def search_wikipedia(query):
     tools = [Tool.from_function(name="wikipedia", func=search_wikipedia, description="Searches Wikipedia")]
     
     # Create the agent using the updated API
-    agent = create_openai_functions_agent(tools=tools, llm=llm, verbose=False)
+    agent = create_openai_functions_agent(tools=tools, llm=llm)
     
     # Run the agent to get a response from Wikipedia
     return agent.invoke({"input": query})
