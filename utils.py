@@ -7,7 +7,7 @@ from twilio.rest import Client
 from decouple import config
 from langchain.tools import Tool
 from langchain_openai import OpenAI
-from langchain.agents import create_openai_functions_agent
+from langchain.agents import create_react_agent
 
 # Twilio setup
 account_sid = config("TWILIO_ACCOUNT_SID")
@@ -48,7 +48,7 @@ def search_wikipedia(query):
     prompt = PromptTemplate.from_template("Use the Wikipedia tool to answer the following query: {input}")
 
     # Create the agent with the prompt
-    agent = create_openai_functions_agent(tools=tools, llm=llm, prompt=prompt)
+    agent = create_react_agent(tools=tools, llm=llm, prompt=prompt)
 
     # Run the agent to get a response from Wikipedia
     return agent.invoke({"input": query})
