@@ -31,7 +31,10 @@ def send_message(to_number, body_text):
     except Exception as e:
         logger.error(f"Error sending message to {to_number}: {e}")
 
-# Wikipedia search logic using updated LangChain
+from langchain.prompts import PromptTemplate
+from langchain.tools import Tool
+from langchain_openai import OpenAI
+
 def search_wikipedia(query):
     """Search Wikipedia using LangChain OpenAI wrapper and return results"""
     
@@ -41,11 +44,11 @@ def search_wikipedia(query):
     # Load tools for Wikipedia (updated tool API)
     tools = [Tool.from_function(name="wikipedia", func=search_wikipedia, description="Searches Wikipedia")]
 
-    # Define the prompt to guide the agent
-    prompt = f"Use the Wikipedia tool to answer the following query: {query}"
-    
-    # Create the agent with the required prompt
+    # Create a PromptTemplate
+    prompt = PromptTemplate.from_template("Use the Wikipedia tool to answer the following query: {input}")
+
+    # Create the agent with the prompt
     agent = create_openai_functions_agent(tools=tools, llm=llm, prompt=prompt)
-    
+
     # Run the agent to get a response from Wikipedia
     return agent.invoke({"input": query})
