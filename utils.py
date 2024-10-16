@@ -40,9 +40,12 @@ def search_wikipedia(query):
     
     # Load tools for Wikipedia (updated tool API)
     tools = [Tool.from_function(name="wikipedia", func=search_wikipedia, description="Searches Wikipedia")]
+
+    # Define the prompt to guide the agent
+    prompt = f"Use the Wikipedia tool to answer the following query: {query}"
     
-    # Create the agent using the updated API
-    agent = create_openai_functions_agent(tools=tools, llm=llm)
+    # Create the agent with the required prompt
+    agent = create_openai_functions_agent(tools=tools, llm=llm, prompt=prompt)
     
     # Run the agent to get a response from Wikipedia
     return agent.invoke({"input": query})
