@@ -36,7 +36,7 @@ from langchain.tools import Tool
 from langchain_openai import OpenAI
 from langchain.agents import create_openai_functions_agent
 
-# Define the actual Wikipedia search function
+# Define the Wikipedia search function
 def wikipedia_search_func(query):
     return f"Results for {query} from Wikipedia"
 
@@ -49,11 +49,15 @@ def search_wikipedia(query):
     # Load tools for Wikipedia
     tools = [Tool.from_function(name="wikipedia", func=wikipedia_search_func, description="Searches Wikipedia")]
 
-    # Create a PromptTemplate
-    prompt = PromptTemplate.from_template("Use the Wikipedia tool to answer the following query: {input}")
+    # Create a PromptTemplate including agent_scratchpad
+    prompt = PromptTemplate.from_template(
+        "Use the Wikipedia tool to answer the following query: {input}\n"
+        "Additional details: {agent_scratchpad}"
+    )
 
     # Create the agent with the prompt
     agent = create_openai_functions_agent(tools=tools, llm=llm, prompt=prompt)
 
     # Run the agent to get a response from Wikipedia
-    return agent.invoke({"input": query})
+    return agent.invoke({"input": query, "agent_scratchpad": ""})
+
