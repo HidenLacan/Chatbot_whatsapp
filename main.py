@@ -94,6 +94,10 @@ from utils import send_message, logger, search_wikipedia
 
 app = FastAPI()
 
+# Set up logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
 # Configuración de Airtable
 air_token = config("AIRTABLE_TOKEN")
 base_id = config("BASE_ID")  # Tu ID de base
@@ -110,11 +114,14 @@ def save_ticket(ticket_number, description, start_date, phone_number):
         "Start date": start_date,
         "Phone_Number": phone_number
     }
+    
+    print(f"Datos enviados a Airtable: {data}")
     try:
-        table.create(data)
-        logger.info(f"Registro creado en Airtable para el número: {phone_number}")
+        record = table.create(data)
+        logger.info(f"Registro creado en Airtable: {record}")
     except Exception as e:
         logger.error(f"Error al crear el registro en Airtable: {e}")
+        raise
 
 @app.get("/")
 def read_root():
@@ -131,16 +138,22 @@ async def reply(request: Request, Body: str = Form()):
     langchain_response = search_wikipedia(Body)
 
     # Obtener la fecha y hora actuales
-    today = datetime.now()
-    formatted_date = today.strftime("%Y-%m-%d %H:%M:%S")
+    #today = datetime.now()
+    #formatted_date = today.strftime("%Y-%m-%d %H:%M:%S")
+    #print(formatted_date)
+    formatted_date = datetime.now().isoformat()
 
     # Almacenar la conversación en Airtable
-    save_ticket(
-        ticket_number=whatsapp_number,
-        description=Body,
-        start_date=formatted_date,
-        phone_number=whatsapp_number
-    )
+    try:
+        save_ticket(
+            ticket_number=whatsapp_number,
+            description=Body,
+            start_date=formatted_date,
+            phone_number=whatsapp_number
+        )
+        logger.info(f"Conversación almacenada para el número de WhatsApp: {whatsapp_number}")
+    except Exception as e:
+        logger.error(f"Error al almacenar la conversación en Airtable: {e}")
 
     # Enviar respuesta al usuario vía WhatsApp
     send_message(whatsapp_number, langchain_response)
