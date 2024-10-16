@@ -65,7 +65,7 @@ async def reply(request: Request, Body: str = Form()):
     whatsapp_number = form_data['From'].split("whatsapp:")[-1]
     print(f"Sending the LangChain response to this number: {whatsapp_number}")
     
-    save_ticket(whatsapp_number, Body, formatted_date, whatsapp_number)
+    #save_ticket(whatsapp_number, Body, formatted_date, whatsapp_number)
 
     # Get the generated text from the LangChain agent
     langchain_response = search_wikipedia(Body)
