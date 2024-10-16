@@ -1,10 +1,14 @@
 import os
 from decouple import config
-from langchain.agents import load_tools
-from langchain.agents import create_react_agent
-from langchain.agents import AgentType
-from langchain.llms import OpenAI
+from langchain.tools import load_tools
+from langchain.agents import create_openai_functions_agent
+from langchain_openai import OpenAI
 
+# Initialize LLM
 llm = OpenAI(temperature=0, openai_api_key=config("OPENAI_API_KEY"))
+
+# Load Wikipedia tool
 tools = load_tools(["wikipedia"], llm=llm)
-agent = create_react_agent(tools, llm, agent=AgentType.ZERO_SHOT_REACT_DESCRIPTION, verbose=True)
+
+# Create agent
+agent = create_openai_functions_agent(tools=tools, llm=llm, verbose=True)
